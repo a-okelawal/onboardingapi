@@ -1,7 +1,5 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-
-import config from '../../config/config';
+import StringUtil from '../shared/StringUtil';
+import TokenUtil from '../shared/TokenUtil';
 import User from '../models/User';
 
 export default class AuthenticationCtrl {
@@ -13,12 +11,13 @@ export default class AuthenticationCtrl {
   static login(req, res) {
     const body = req.body;
 
+
     AuthenticationCtrl.findUser(body).then((user) => {
       if (!user) {
         res.status(404).send({ error: 'User with email does not exist.' });
       } else {
-        if (AuthenticationCtrl.comparePasswords(body.password, user.password)) {
-          const jwt = AuthenticationCtrl.generateToken(user);
+        if (StringUtil.comparePasswords(body.password, user.password)) {
+          const jwt = TokenUtil.generateToken(user);
           const details = {
             id: user._id,
             name: user.name,
@@ -46,7 +45,7 @@ export default class AuthenticationCtrl {
     let user = new User({
       name: body.name,
       email: body.email,
-      password: AuthenticationCtrl.hashPassword(body.password),
+      password: StringUtil.hashPassword(body.password),
       phone: body.phone,
       department: body.department,
       recentHire: body.recentHire,
@@ -70,7 +69,7 @@ export default class AuthenticationCtrl {
       } else if (body.secret !== user.secret) {
         res.status(401).send({ error: 'Invalid Secret.' });
       } else {
-        user.password = AuthenticationCtrl.hashPassword(body.password);
+        user.password = StringUtil.hashPassword(body.password);
         
         user.save((err) => {
           if (err) {
@@ -124,31 +123,5 @@ export default class AuthenticationCtrl {
         }
       });
     });
-  }
-
-  /**
-   * Function to hash password
-   * @param {*} password 
-   */
-  static hashPassword(password) {
-    const salt = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(password, salt);
-  }
-
-  /**
-   * Compare Passwords
-   * @param {*} password 
-   * @param {*} hash 
-   */
-  static comparePasswords(password, hash) {
-    return bcrypt.compareSync(password, hash);
-  }
-
-  /**
-   * Generate signed token
-   * @param {*} user 
-   */
-  static generateToken(user) {
-    return jwt.sign({ id: user._id, name: user.name, role: user.role }, config.secret);
   }
 }
