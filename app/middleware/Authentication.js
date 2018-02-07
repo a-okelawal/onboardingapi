@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 
 import config from '../../config/config';
 import StringUtil from '../shared/StringUtil';
+import TokenUtil from '../shared/TokenUtil';
 
 export default class Authentication {
   /**
@@ -39,20 +40,20 @@ export default class Authentication {
   static authenticate(req, res, next) {
     const token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['Authorization'];
 
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        res.status(401).send({ error: 'Invalid token.' });
-      } else {
+    TokenUtil.verify(token)
+      .then((decoded) => {
         req.user = decoded;
         next();
-      }
-    });
+      })
+      .catch((err) => {
+        res.status(err.code).send({ error: err.error });
+      });
   }
 
   static forgotPasswordValidator(req, res, next) {
     const body = req.body;
 
-    if (!Util.isEmailValid(body.email)) {
+    if (!StringUtil.isEmailValid(body.email)) {
       res.status(400).send({ error: 'Invalid email address.' });
     } else if (body.password.length < 6) {
       res.status(400).send({ error: 'Invalid Password.' });
