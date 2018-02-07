@@ -12,7 +12,7 @@ export default class AuthenticationCtrl {
     const body = req.body;
 
 
-    AuthenticationCtrl.findUser(body).then((user) => {
+    User.findUserByEmail(body.email).then((user) => {
       if (!user) {
         res.status(404).send({ error: 'User with email does not exist.' });
       } else {
@@ -52,7 +52,7 @@ export default class AuthenticationCtrl {
       secret: body.secret
     });
 
-    AuthenticationCtrl.createUser(user).then((result) => {
+    User.createUser(user).then((result) => {
       res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role}.` });
       //TODO: Send Email to employee with details
     }).catch((err) => {
@@ -60,10 +60,15 @@ export default class AuthenticationCtrl {
     });
   }
 
+  /**
+   * Logic for forgot password
+   * @param {*} req 
+   * @param {*} res 
+   */
   static forgotPassword(req, res) {
     const body = req.body;
 
-    AuthenticationCtrl.findUser(body).then((user) => {
+    User.findUserByEmail(body.email).then((user) => {
       if (!user) {
         res.status(404).send({ error: 'User does not exist.' });
       } else if (body.secret !== user.secret) {
@@ -82,46 +87,6 @@ export default class AuthenticationCtrl {
     })
     .catch((err) => {
       res.status(err.code).send({ error: err.error });
-    });
-  }
-
-  /**
-   * Save User
-   * @param {*} user 
-   */
-  static createUser(user) {
-    return new Promise((resolve, reject) => {
-      AuthenticationCtrl.findUser(user).then((result) => {
-        if (result) {
-          reject({ code: 409, error: 'User with email already exists.' });
-        } else {
-          user.save((err) => {
-            if (err) {
-              reject({ code: 500, error: err });
-            } else {
-              resolve(user);
-            }
-          });
-        }
-      }).catch((err) => {
-        reject(err);
-      });
-    });
-  }
-
-  /**
-   * Find User
-   * @param {*} data 
-   */
-  static findUser(data) {
-    return new Promise((resolve, reject) => {
-      User.findOne({ email: data.email }, (err, user) => {
-        if (err) {
-          reject({ code: 500, error: err});
-        } else {
-          resolve(user);
-        }
-      });
     });
   }
 }
