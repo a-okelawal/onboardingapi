@@ -50,6 +50,12 @@ export default class Authentication {
       });
   }
 
+  /**
+   * Validate forgot password data
+   * @param {*} req 
+   * @param {*} res 
+   * @param {*} next 
+   */
   static forgotPasswordValidator(req, res, next) {
     const body = req.body;
 
