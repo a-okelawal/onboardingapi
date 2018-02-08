@@ -59,9 +59,9 @@ export default class AuthenticationCtrl {
         res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role}.` });
       } else {
         body.onboardingList = req.department.onboardingList;
-        body.assignee = user._id;
+        body.assignee = user.name;
 
-        Task.createMultiple(body, req.user.id)
+        Task.createMultiple(body, req.user.name)
         .then((result) => {
             res.status(201).send({ message: `${result.name} was created and onboarded successfully as a/an ${result.role}.` });
           })
