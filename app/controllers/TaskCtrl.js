@@ -27,16 +27,83 @@ export default class TaskController {
     const page = req.body.page || req.query.page || 0;
     const limit = req.body.limit || req.query.limit || 10;
     const status = req.body.status || req.query.status;
+    const term = req.body.query || req.query.query;
+    const begin = req.body.begin || req.query.begin;
+    const end = req.body.end || req.query.end;
+    
+    if (term) {
+      query['$and'] = [{
+        $or: [
+          {
+            'administrator': {
+              $regex: term,
+              $options: 'i'
+            }
+          },
+          {
+            'assignee': {
+              $regex: term,
+              $options: 'i'
+            }
+          },
+          {
+            'creator': {
+              $regex: term,
+              $options: 'i'
+            }
+          },
+          {
+            'task': {
+              $regex: term,
+              $options: 'i'
+            }
+          },
+          {
+            'status': {
+              $regex: term,
+              $options: 'i'
+            }
+          }
+        ]
+      }];
+    }
 
-    if (status) {
-      query['status'] = status;
+    if (begin && end) {
+      query['$and'] = [
+        {
+          'due': {
+            $gte: new Date(begin)
+          }
+        },
+        {
+          'due': {
+            $lte: new Date(end)
+          }
+        }
+      ]
     }
 
     Task.find(query)
     .limit(limit)
     .skip(limit * page)
+    .populate({
+      path: 'administrator',
+      select: 'name',
+      model: 'User'
+    })
+    .populate({
+      path: 'assignee',
+      select: 'name',
+      model: 'User'
+    })
+    .populate({
+      path: 'creator',
+      select: 'name',
+      model: 'User'
+    })
     .exec((err, tasks) => {
       if (err) {
+        console.log(err);
         res.status(500).send({ error: err });
       } else {
         res.status(200).send(tasks);

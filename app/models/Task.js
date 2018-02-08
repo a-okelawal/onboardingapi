@@ -2,19 +2,19 @@ import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
   administrator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: String,
+    required: true,
+    lowercase: true
   },
   assignee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: String,
+    required: true,
+    lowercase: true
   },
   creator: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    type: String,
+    required: true,
+    lowercase: true
   },
   task: {
     type: String,
@@ -62,7 +62,7 @@ Task.createOne = function(body, id) {
   });
 };
 
-Task.createMultiple = function(body, creatorId) {
+Task.createMultiple = function(body, creator) {
   return new Promise((resolve, reject) => {
     var tasks = [];
     var aweek = new Date();
@@ -70,11 +70,11 @@ Task.createMultiple = function(body, creatorId) {
 
     body.onboardingList.forEach(element => {
       tasks.push(new Task({
-        administrator: creatorId,
+        administrator: creator,
         assignee: body.assignee,
         task: element,
         due: body.due || aweek,
-        creator: creatorId
+        creator: creator
       }));
     });
 
