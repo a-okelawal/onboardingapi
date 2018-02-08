@@ -7,21 +7,20 @@ export default class TaskController {
   static create(req, res) {
     const body = req.body;
 
-    Task.create({
-      administrator: body.administrator,
-      assignee: body.assignee,
-      task: body.task,
-      due: new Date(body.due),
-      creator: req.user.id
-    }, (err, task) => {
-      if (err) {
-        res.status(500).send({ error: err });
-      } else {
+    Task.create(body, req.user.id)
+      .then((task) => {
         res.status(201).send({ message: 'Task created successfully.' });
-      }
-    });
+      })
+      .catch((err) => {
+        res.status(err.code).send({ error: err.error });
+      });
   }
 
+  /**
+   * Read tasks
+   * @param {*} req 
+   * @param {*} res 
+   */
   static read(req, res) {
     let query = {};
 

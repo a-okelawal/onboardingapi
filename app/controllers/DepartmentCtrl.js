@@ -9,16 +9,13 @@ export default class DepartmentCtrl {
   static create(req, res) {
     const body = req.body;
     
-    Department.create({
-      name: body.name,
-      onboardingList: body.onboardingList
-    }, (err, department) => {
-      if (err) {
-        res.status(500).send({ error: err });
-      } else {
+    Department.create(body)
+      .then((department) => {
         res.status(201).send({ message: `${department.name} created successfully.` });
-      }
-    });
+      })
+      .catch((err) => {
+        res.status(err.code).send({error: err.error});
+      });
   }
 
   /**
@@ -47,7 +44,7 @@ export default class DepartmentCtrl {
     const body = req.body;
     const id = req.params.id;
 
-    DepartmentCtrl.findDepartmentBy(id).then((result) => {
+    Department.findDeptById(id).then((result) => {
       ['name', 'onboardingList'].forEach((key) => {
         if (body[key]) {
           result[key] = body[key];
@@ -63,24 +60,6 @@ export default class DepartmentCtrl {
       });
     }).catch((err) => {
       res.status(err.code).send({ error: err.error});
-    });
-  }
-
-  /**
-   * Function to find department
-   * @param {*} id 
-   */
-  static findDepartmentBy(id) {
-    return new Promise((resolve, reject) => {
-      Department.findById(id, (err, department) => {
-        if (err) {
-          reject({ code: 500, error: err });
-        } else if (!department) {
-          reject({ code: 404, error: 'Department does not exist.' });
-        } else {
-          resolve(department);
-        }
-      });
     });
   }
 }

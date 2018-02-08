@@ -44,4 +44,48 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+/**
+ * Create User
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} user 
+ */
+User.createUser = function(user) {
+  return new Promise((resolve, reject) => {
+    this.findUserByEmail(user.email).then((result) => {
+      if (result) {
+        reject({ code: 409, error: 'User with email already exists.' });
+      } else {
+        user.save((err) => {
+          if (err) {
+            reject({ code: 500, error: err });
+          } else {
+            resolve(user);
+          }
+        });
+      }
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+};
+
+/**
+ * Find user by email
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} email 
+ */
+User.findUserByEmail = function(email) {
+  return new Promise((resolve, reject) => {
+    this.findOne({ email: email }, (err, user) => {
+      if (err) {
+        reject({ code: 500, error: err});
+      } else {
+        resolve(user);
+      }
+    });
+  });
+};
+
+export default User;
