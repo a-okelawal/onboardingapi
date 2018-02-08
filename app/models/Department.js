@@ -4,7 +4,8 @@ const departmentSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    lowercase: true
   },
   onboardingList: [{
     type: String,
@@ -21,10 +22,8 @@ const Department = mongoose.model('Department', departmentSchema);
  */
 Department.create = function(body) {
   return new Promise((resolve, reject) => {
-    this.findByName(body.name).then((err, department) => {
-      if (err) {
-        reject({ code: 500, error: err });
-      } else if (department) {
+    this.findByName(body.name).then((department) => {
+      if (department) {
         reject({ code: 409, error: 'Department already exists.' });
       } else {
         department = new Department({
@@ -40,7 +39,9 @@ Department.create = function(body) {
           }
         });
       }
-    })
+    }).catch((err) => {
+      reject({ code: 500, error: err });
+    });
   });
 };
 
@@ -70,7 +71,7 @@ Department.findDeptById = function(id) {
  */
 Department.findByName = function(name) {
   return new Promise((resolve, reject) => {
-    this.findOne({ name: name }, (err, department) => {
+    this.findOne({ name: name.toLowerCase() }, (err, department) => {
       if (err) {
         reject({ code: 500, error: err });
       } else {

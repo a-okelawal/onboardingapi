@@ -5,6 +5,7 @@ import server from '../server';
 
 const request = supertest(server);
 
+let did;
 let etoken, stoken;
 
 describe('Authentication', () => {
@@ -21,8 +22,26 @@ describe('Authentication', () => {
       });
   });
 
-  describe('signup', () => {
+  before((done) => {
+    request
+      .post('/api/v1/dept')
+      .set('x-access-token', stoken)
+      .send({
+        name: 'test',
+        onboardingList: [
+          'One',
+          'Two',
+          'Three'
+        ]
+      })
+      .end((err, res) => {
+        did = res.body.department._id;
+        console.log(did);
+        done();
+      });
+  });
 
+  describe('signup', () => {
     describe('allows', () => {      
       it('signup with all valid requirements', (done) => {
         request
@@ -33,9 +52,10 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'password',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
-            secret: 'secret'
+            secret: 'secret',
+            recentHire: false
           })
           .end((err, res) => {
             res.status.should.equal(201);
@@ -54,7 +74,7 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'password',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'secret'
           })
@@ -73,7 +93,7 @@ describe('Authentication', () => {
             email: 'Te@co',
             password: 'password',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'secret'
           })
@@ -92,7 +112,7 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'pas',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'secret'
           })
@@ -121,6 +141,26 @@ describe('Authentication', () => {
           });
       });
 
+      it('signup with invalid department id', (done) => {
+        request
+          .post('/api/v1/auth/signup')
+          .send({
+            name: 'Test User',
+            email: 'test@email.com',
+            password: 'password',
+            phone: '08011110000',
+            department: 'xxxx897951929e14a2axxxxx',
+            dOE: '01/01/2018',
+            secret: 'secret',
+            recentHire: true
+          })
+          .end((err, res) => {
+            res.status.should.equal(400);
+            res.body.error.should.equal('Department invalid.');
+            done();
+          });
+      });
+
       it('signup with an invalid phone number', (done) => {
         request
           .post('/api/v1/auth/signup')
@@ -129,7 +169,7 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'password',
             phone: '080111100',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'secret'
           })
@@ -148,7 +188,7 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'password',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'sec'
           })
@@ -168,7 +208,7 @@ describe('Authentication', () => {
             email: 'test@email.com',
             password: 'password',
             phone: '08011110000',
-            department: '4oi4oi3o9409',
+            department: did,
             dOE: '01/01/2018',
             secret: 'secret'
           })

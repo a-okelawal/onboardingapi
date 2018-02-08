@@ -42,7 +42,7 @@ const Task = mongoose.model('Task', taskSchema);
  * Note: es6 does not work with mongoose model
  * @param {*} body 
  */
-Task.create = function(body, id) {
+Task.createOne = function(body, id) {
   return new Promise((resolve, reject) => {
     const task = new Task({
       administrator: body.administrator,
@@ -57,6 +57,32 @@ Task.create = function(body, id) {
         reject({code: 500, error: err });
       } else {
         resolve(task);
+      }
+    });
+  });
+};
+
+Task.createMultiple = function(body, creatorId) {
+  return new Promise((resolve, reject) => {
+    var tasks = [];
+    var aweek = new Date();
+    aweek.setDate(aweek.getDate() + 7);
+
+    body.onboardingList.forEach(element => {
+      tasks.push(new Task({
+        administrator: creatorId,
+        assignee: body.assignee,
+        task: element,
+        due: body.due || aweek,
+        creator: creatorId
+      }));
+    });
+
+    Task.create(tasks, (err, list) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(list);
       }
     });
   });

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 import config from '../../config/config';
+import Department from '../models/Department';
 import StringUtil from '../shared/StringUtil';
 import TokenUtil from '../shared/TokenUtil';
 
@@ -13,6 +14,7 @@ export default class Authentication {
    */
   static signupValidator(req, res, next) {
     const body = req.body;
+    console.log('Body body');
 
     if (!body.name || body.name.length < 7 || (body.name.split(' ')).length < 2) {
       res.status(400).send({ error: 'Name must have atleast first and last name.' });
@@ -26,6 +28,15 @@ export default class Authentication {
       res.status(400).send({ error: 'Phone number is invalid.' });
     } else if (!body.secret || body.secret.length < 6) {
       res.status(400).send({ error: 'Secret is invalid.' });
+    } else if ('recentHire' in body && body.recentHire) {
+      Department.findDeptById(body.department)
+        .then((department) => {
+          req.department = department;
+          next();
+        })
+        .catch((err) => {
+          res.status(400).send({ error: 'Department invalid.' });
+        });
     } else {
       next();
     }

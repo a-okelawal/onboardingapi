@@ -1,4 +1,5 @@
 import StringUtil from '../shared/StringUtil';
+import Task from '../models/Task';
 import TokenUtil from '../shared/TokenUtil';
 import User from '../models/User';
 
@@ -22,7 +23,8 @@ export default class AuthenticationCtrl {
             id: user._id,
             name: user.name,
             email: user.email,
-            recentHire: user.recentHire
+            recentHire: user.recentHire,
+            role: user.role
           };
           res.status(200).send({user: details, jwt});
         } else {
@@ -39,7 +41,7 @@ export default class AuthenticationCtrl {
    * @param {*} req 
    * @param {*} res 
    */
-  static signup(req, res) {
+  static signup(req, res, next) {
     const body = req.body;
 
     let user = new User({
@@ -53,7 +55,20 @@ export default class AuthenticationCtrl {
     });
 
     User.createUser(user).then((result) => {
-      res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role}.` });
+      if (!body.recentHire) {
+        res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role}.` });
+      } else {
+        body.onboardingList = req.department.onboardingList;
+        body.assignee = user._id;
+
+        Task.createMultiple(body, req.user.id)
+        .then((result) => {
+            res.status(201).send({ message: `${result.name} was created and onboarded successfully as a/an ${result.role}.` });
+          })
+          .catch((err) => {
+            res.status(201).send({ error: `${result.name} was created successfully as a/an ${result.role} but onboarding was unsuccessful.` });
+          });
+      }
       //TODO: Send Email to employee with details
     }).catch((err) => {
       res.status(err.code).send({ error: err.error});

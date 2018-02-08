@@ -78,7 +78,7 @@ User.createUser = function(user) {
  */
 User.findUserByEmail = function(email) {
   return new Promise((resolve, reject) => {
-    this.findOne({ email: email }, (err, user) => {
+    this.findOne({ email: email.toLowerCase() }, (err, user) => {
       if (err) {
         reject({ code: 500, error: err});
       } else {
