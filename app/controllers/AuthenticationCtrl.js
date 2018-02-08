@@ -1,5 +1,5 @@
 import StringUtil from '../shared/StringUtil';
-import TaskCtrl from '../controllers/TaskCtrl';
+import Task from '../models/Task';
 import TokenUtil from '../shared/TokenUtil';
 import User from '../models/User';
 
@@ -60,13 +60,13 @@ export default class AuthenticationCtrl {
       } else {
         body.onboardingList = req.department.onboardingList;
         body.assignee = user._id;
-        
-        TaskCtrl.createMultiple(body, req.user.id)
-          .then((result) => {
+
+        Task.createMultiple(body, req.user.id)
+        .then((result) => {
             res.status(201).send({ message: `${result.name} was created and onboarded successfully as a/an ${result.role}.` });
           })
           .catch((err) => {
-            res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role} but onboarding was unsuccessful.` });
+            res.status(201).send({ error: `${result.name} was created successfully as a/an ${result.role} but onboarding was unsuccessful.` });
           });
       }
       //TODO: Send Email to employee with details

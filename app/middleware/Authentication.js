@@ -14,6 +14,7 @@ export default class Authentication {
    */
   static signupValidator(req, res, next) {
     const body = req.body;
+    console.log('Body body');
 
     if (!body.name || body.name.length < 7 || (body.name.split(' ')).length < 2) {
       res.status(400).send({ error: 'Name must have atleast first and last name.' });
