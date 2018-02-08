@@ -65,7 +65,7 @@ describe('Department', () => {
           })
           .end((err, res) => {
             res.status.should.equal(201);
-            res.body.message.should.equal('H.R created successfully.');
+            res.body.message.should.equal('h.r created successfully.');
             done();
           });
       });
@@ -79,7 +79,7 @@ describe('Department', () => {
         .set('x-access-token', stoken)
         .end((err, res) => {
           res.status.should.equal(200);
-          res.body.length.should.equal(1);
+          res.body.length.should.equal(2);
           did = res.body[0]._id;
           done();
         });
@@ -128,7 +128,7 @@ describe('Department', () => {
           })
           .end((err, res) => {
             res.status.should.equal(200);
-            res.body.message.should.equal('Human Resources was updated successfully.');
+            res.body.message.should.equal('human resources was updated successfully.');
             done();
           });
       });

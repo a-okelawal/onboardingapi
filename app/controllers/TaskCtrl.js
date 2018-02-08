@@ -7,7 +7,7 @@ export default class TaskController {
   static create(req, res) {
     const body = req.body;
 
-    Task.create(body, req.user.id)
+    Task.createOne(body, req.user.id)
       .then((task) => {
         res.status(201).send({ message: 'Task created successfully.' });
       })

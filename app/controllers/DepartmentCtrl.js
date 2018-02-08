@@ -8,10 +8,10 @@ export default class DepartmentCtrl {
    */
   static create(req, res) {
     const body = req.body;
-    
+
     Department.create(body)
       .then((department) => {
-        res.status(201).send({ message: `${department.name} created successfully.` });
+        res.status(201).send({ message: `${department.name} created successfully.`, department });
       })
       .catch((err) => {
         res.status(err.code).send({error: err.error});

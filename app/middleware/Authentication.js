@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 import config from '../../config/config';
+import Department from '../models/Department';
 import StringUtil from '../shared/StringUtil';
 import TokenUtil from '../shared/TokenUtil';
 
@@ -26,6 +27,15 @@ export default class Authentication {
       res.status(400).send({ error: 'Phone number is invalid.' });
     } else if (!body.secret || body.secret.length < 6) {
       res.status(400).send({ error: 'Secret is invalid.' });
+    } else if ('recentHire' in body && body.recentHire) {
+      Department.findDeptById(body.department)
+        .then((department) => {
+          req.department = department;
+          next();
+        })
+        .catch((err) => {
+          res.status(400).send({ error: 'Department invalid.' });
+        });
     } else {
       next();
     }
