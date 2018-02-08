@@ -44,10 +44,6 @@ export default class AuthenticationCtrl {
   static signup(req, res, next) {
     const body = req.body;
 
-    if (body.recentHire) {
-      body.onboardingList = req.department.onboardingList;
-    }
-
     let user = new User({
       name: body.name,
       email: body.email,
@@ -62,7 +58,10 @@ export default class AuthenticationCtrl {
       if (!body.recentHire) {
         res.status(201).send({ message: `${result.name} was created successfully as a/an ${result.role}.` });
       } else {
-        TaskCtrl.createMultiple(body, user, req.user.id)
+        body.onboardingList = req.department.onboardingList;
+        body.assignee = user._id;
+        
+        TaskCtrl.createMultiple(body, req.user.id)
           .then((result) => {
             res.status(201).send({ message: `${result.name} was created and onboarded successfully as a/an ${result.role}.` });
           })

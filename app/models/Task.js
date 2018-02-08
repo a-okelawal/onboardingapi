@@ -62,7 +62,7 @@ Task.createOne = function(body, id) {
   });
 };
 
-Task.createMultiple = function(body, user, creatorId) {
+Task.createMultiple = function(body, creatorId) {
   return new Promise((resolve, reject) => {
     var tasks = [];
     var aweek = new Date();
@@ -71,9 +71,9 @@ Task.createMultiple = function(body, user, creatorId) {
     body.onboardingList.forEach(element => {
       tasks.push(new Task({
         administrator: creatorId,
-        assignee: user._id,
+        assignee: body.assignee,
         task: element,
-        due: aweek,
+        due: body.due || aweek,
         creator: creatorId
       }));
     });
