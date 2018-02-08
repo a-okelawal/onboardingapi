@@ -14,6 +14,11 @@ const departmentSchema = new mongoose.Schema({
 
 const Department = mongoose.model('Department', departmentSchema);
 
+/**
+ * Create a department
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} body 
+ */
 Department.create = function(body) {
   return new Promise((resolve, reject) => {
     this.findByName(body.name).then((err, department) => {
@@ -39,6 +44,11 @@ Department.create = function(body) {
   });
 };
 
+/**
+ * Find a department by id
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} id 
+ */
 Department.findDeptById = function(id) {
   return new Promise((resolve, reject) => {
     this.findById(id, (err, department) => {
@@ -53,6 +63,11 @@ Department.findDeptById = function(id) {
   });
 };
 
+/**
+ * Find a department by name
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} name 
+ */
 Department.findByName = function(name) {
   return new Promise((resolve, reject) => {
     this.findOne({ name: name }, (err, department) => {

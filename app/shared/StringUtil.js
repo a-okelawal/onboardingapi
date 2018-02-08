@@ -20,6 +20,14 @@ export default class StringUtil {
   }
 
   /**
+   * Check if date is valid
+   * @param {*} date 
+   */
+  static isDateValid(date) {
+    return /^\d{1,2}(\/|-)\d{1,2}(\/|-)(?:\d{2}|\d{4})$/.test(date);
+  }
+
+  /**
    * Test if email is valid
    * @param {*} email 
    */

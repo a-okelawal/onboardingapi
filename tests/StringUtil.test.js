@@ -4,7 +4,7 @@ import should from 'should';
 
 import StringUtil from '../app/shared/StringUtil';
 
-let invalidEmails, invalidNumbers, validEmails, validNumbers;
+let invalidDates, invalidEmails, invalidNumbers, validDates, validEmails, validNumbers;
 let password;
 
 describe('String Utility', () => {
@@ -67,11 +67,11 @@ describe('String Utility', () => {
   });
 
   describe('Hash Password', () => {
-    before(function() {
+    before(() => {
       sinon.stub(bcrypt, 'hashSync').returns('G4HG3H4G3H4G3J4');
     });
     
-    after(function() {
+    after(() => {
       bcrypt.hashSync.restore();
     });
 
@@ -83,6 +83,34 @@ describe('String Utility', () => {
     it('should return true for valid emails', () => {
       validNumbers.forEach(element => {
         StringUtil.isPhoneValid(element).should.equal(true);
+      });
+    });
+  });
+
+  describe('Date Validator', () => {
+    before(() => {
+      invalidDates = [
+        'dflhkfhf',
+        '03-02*3333',
+        '03|02-3333'
+      ];
+
+      validDates = [
+        '03-02-2019',
+        '03/04/18',
+        '03/02-3333'
+      ];
+    });
+
+    it('should return false for invalid dates', () => {
+      invalidDates.forEach(element => {
+        StringUtil.isDateValid(element).should.equal(false);
+      });
+    });
+
+    it('should return true for valid dates', () => {
+      validDates.forEach(element => {
+        StringUtil.isDateValid(element).should.equal(true);
       });
     });
   });
