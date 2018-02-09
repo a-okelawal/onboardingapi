@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
+import Department from '../app/models/Department';
 import User from '../app/models/User';
 
 dotenv.config();
@@ -37,23 +38,35 @@ mongoose.connection.once('connected', () => {
   }
 
   const salt = bcrypt.genSaltSync(10);
-
-  User.findOne({ email: process.env.SUPEREMAIL}, (err, user) => {
-    if (!user) {
-      User.create({
-        name: 'Super Admin',
-        email: process.env.SUPEREMAIL,
-        password: bcrypt.hashSync(process.env.SUPERPASSWORD, salt),
-        role: 'super',
-        phone: process.env.SUPERPHONE,
-        department: 'Management',
-        secret: 'superadmin'
-      }, (err, user) => {
-        console.log('Created Super User');
-        process.exit(0);
+  
+  Department.findOne({ name: 'management'}, (err, department) => {
+    if (!department) {
+      department = new Department({
+        name: 'Management',
+        onboardingList: []
       });
-    } else {
-      process.exit(0);
+      
+      department.save();
     }
+
+    User.findOne({ email: process.env.SUPEREMAIL}, (err, user) => {
+      if (!user) {
+        User.create({
+          name: 'Super Admin',
+          email: process.env.SUPEREMAIL,
+          password: bcrypt.hashSync(process.env.SUPERPASSWORD, salt),
+          role: 'super',
+          phone: process.env.SUPERPHONE,
+          department: department._id,
+          secret: 'superadmin',
+          recentHire: false
+        }, (err, user) => {
+          console.log('Created Super User');
+          process.exit(0);
+        });
+      } else {
+        process.exit(0);
+      }
+    });
   });
 });

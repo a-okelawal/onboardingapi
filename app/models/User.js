@@ -21,9 +21,9 @@ const userSchema = new mongoose.Schema({
     maxlength: 11
   },
   department: {
-    type: String
-    //TODO: Add the code below once the Department model has been created
-    // ref: 'Department'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Department',
+    required: true
   },
   dOE: {
     type: Date,
@@ -81,6 +81,25 @@ User.findUserByEmail = function(email) {
     this.findOne({ email: email.toLowerCase() }, (err, user) => {
       if (err) {
         reject({ code: 500, error: err});
+      } else {
+        resolve(user);
+      }
+    });
+  });
+};
+
+/**
+ * Find user by email
+ * Note: es6 function syntax will not work for model methods
+ * @param {*} email 
+ */
+User.findUserById = function(id) {
+  return new Promise((resolve, reject) => {
+    this.findById(id, (err, user) => {
+      if (err) {
+        reject({ code: 500, error: err});
+      } else if (!user) {
+        reject({ code: 404, error: 'User does not exist.'});
       } else {
         resolve(user);
       }
