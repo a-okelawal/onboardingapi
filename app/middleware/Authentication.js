@@ -1,6 +1,3 @@
-import jwt from 'jsonwebtoken';
-
-import config from '../../config/config';
 import Department from '../models/Department';
 import StringUtil from '../shared/StringUtil';
 import TokenUtil from '../shared/TokenUtil';

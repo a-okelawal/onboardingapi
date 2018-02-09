@@ -7,7 +7,7 @@ export default class TaskController {
   static create(req, res) {
     const body = req.body;
 
-    Task.createOne(body, req.user.id)
+    Task.createOne(body, req.user.name)
       .then((task) => {
         res.status(201).send({ message: 'Task created successfully.' });
       })
@@ -86,21 +86,6 @@ export default class TaskController {
     Task.find(query)
     .limit(limit)
     .skip(limit * page)
-    .populate({
-      path: 'administrator',
-      select: 'name',
-      model: 'User'
-    })
-    .populate({
-      path: 'assignee',
-      select: 'name',
-      model: 'User'
-    })
-    .populate({
-      path: 'creator',
-      select: 'name',
-      model: 'User'
-    })
     .exec((err, tasks) => {
       if (err) {
         console.log(err);
