@@ -62,8 +62,10 @@ export default class AuthenticationCtrl {
         body.assignee = user.name;
 
         Task.createMultiple(body, req.user.name)
-        .then((result) => {
+        .then((data) => {
             res.status(201).send({ message: `${result.name} was created and onboarded successfully as a/an ${result.role}.` });
+            user.recentHire = false;
+            user.save();
           })
           .catch((err) => {
             res.status(201).send({ error: `${result.name} was created successfully as a/an ${result.role} but onboarding was unsuccessful.` });

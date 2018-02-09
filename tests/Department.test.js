@@ -79,7 +79,7 @@ describe('Department', () => {
         .set('x-access-token', stoken)
         .end((err, res) => {
           res.status.should.equal(200);
-          res.body.length.should.equal(2);
+          res.body.length.should.equal(3);
           did = res.body[0]._id;
           done();
         });
