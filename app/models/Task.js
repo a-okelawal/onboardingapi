@@ -42,14 +42,14 @@ const Task = mongoose.model('Task', taskSchema);
  * Note: es6 does not work with mongoose model
  * @param {*} body 
  */
-Task.createOne = function(body, id) {
+Task.createOne = function(body, name) {
   return new Promise((resolve, reject) => {
     const task = new Task({
       administrator: body.administrator,
       assignee: body.assignee,
       task: body.task,
       due: new Date(body.due),
-      creator: id
+      creator: name
     });
     
     task.save((err) => {
